@@ -121,6 +121,12 @@
       "skillPath": "skills/image/SKILL.md",
       "computedHash": "765c859592ba8bc959e54cb19aaa1fe7f249d021b5ac89e7531fb10a7cc7c584"
     },
+    "instagram-research": {
+      "source": "bradautomates/head-of-content",
+      "sourceType": "github",
+      "skillPath": "instagram-research/SKILL.md",
+      "computedHash": "32a7e27cdbeec790aa29b74d7aea134a4447e3b7d7399056e3d61b34a1934056"
+    },
     "launch-strategy": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
