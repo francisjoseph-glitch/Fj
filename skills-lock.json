@@ -355,6 +355,12 @@
       "skillPath": "skills/social-content/SKILL.md",
       "computedHash": "755e9cc7e222bc6196972e749a4eaebf97f9827a331a19265f220bbf7e3c234e"
     },
+    "summarize": {
+      "source": "steipete/clawdis",
+      "sourceType": "github",
+      "skillPath": "skills/summarize/SKILL.md",
+      "computedHash": "4b090b1eaf9a1d62c50971c6bcd5b4357bca209dcdfe41b2180fdc746352625f"
+    },
     "template-skill": {
       "source": "anthropics/skills",
       "sourceType": "github",
