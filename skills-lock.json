@@ -97,6 +97,12 @@
       "skillPath": "skills/directory-submissions/SKILL.md",
       "computedHash": "1cd4801008e821819263051ae49d7447e3d5c862e29346659468335ce3ca9869"
     },
+    "docx": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/docx/SKILL.md",
+      "computedHash": "6962db07127ee540a56e4677f65576d0727668a1d67f7da8bc978f10791c2bfe"
+    },
     "email-sequence": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
