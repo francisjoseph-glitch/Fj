@@ -355,6 +355,12 @@
       "skillPath": "skills/slack-gif-creator/SKILL.md",
       "computedHash": "fab4fcfcaed371071069d61a3ab94dff15d10d36403ff269d147ea986cd98083"
     },
+    "sleek-design-mobile-apps": {
+      "source": "sleekdotdesign/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/design-mobile-apps/SKILL.md",
+      "computedHash": "221077750eaa965acb6062c3c345aa834b098bf4b6c53085687d33275298c1f5"
+    },
     "social-content": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
