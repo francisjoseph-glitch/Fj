@@ -13,6 +13,12 @@
       "skillPath": "skills/ad-creative/SKILL.md",
       "computedHash": "5d8f869c7e683e4d4fc7aa7a2b0d370b0ad54a81d9cffb48736ffc47759b3f4d"
     },
+    "ai-image-generation": {
+      "source": "inferen-sh/skills",
+      "sourceType": "github",
+      "skillPath": "tools/image/ai-image-generation/SKILL.md",
+      "computedHash": "34d9d36a221fcfc9a376d6f35aa005c6c700f2e2fc738698ba8a21a7fc0c5bf5"
+    },
     "ai-seo": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
