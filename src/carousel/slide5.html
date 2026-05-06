@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>Slide 5 – CTA</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1080px; overflow: hidden;
+    background: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* top yellow band */
+  .top-band {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 260px;
+    background: #FFCC00;
+  }
+
+  .content {
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 80px;
+  }
+
+  /* avatar circle sits on the band/white boundary */
+  .avatar-wrap {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: #000;
+    border: 8px solid #FFFFFF;
+    margin-bottom: 36px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    /* sits on band boundary */
+    margin-top: -80px;
+  }
+
+  .avatar-wrap svg { width: 110px; height: 110px; }
+
+  .tag {
+    display: inline-block;
+    background: #FFCC00;
+    color: #000;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 24px;
+    border-radius: 50px;
+    margin-bottom: 28px;
+  }
+
+  h2 {
+    font-size: 64px;
+    font-weight: 900;
+    color: #000;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .sub {
+    font-size: 28px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 56px;
+    line-height: 1.5;
+  }
+
+  .cta-btn {
+    background: #FFCC00;
+    color: #000;
+    font-size: 32px;
+    font-weight: 800;
+    padding: 28px 72px;
+    border-radius: 60px;
+    margin-bottom: 48px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 0px #c9a000;
+  }
+
+  .handle-row {
+    display: flex; align-items: center; gap: 14px;
+  }
+
+  .dot { width: 10px; height: 10px; background: #FFCC00; border-radius: 50%; }
+
+  .handle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  /* bottom brand strip */
+  .bottom-strip {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 10px;
+    background: #FFCC00;
+  }
+</style>
+</head>
+<body>
+  <div class="top-band"></div>
+
+  <div class="content">
+    <div class="avatar-wrap">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="28" r="16" fill="#FFCC00"/>
+        <ellipse cx="40" cy="62" rx="24" ry="16" fill="#FFCC00"/>
+      </svg>
+    </div>
+
+    <div class="tag">More tips every week</div>
+    <h2>Found this helpful? 💛</h2>
+    <p class="sub">Follow for weekly CommBank tips,<br>home loan hacks &amp; money wins</p>
+    <div class="cta-btn">Follow for more tips →</div>
+    <div class="handle-row">
+      <div class="dot"></div>
+      <span class="handle">@yourhandle</span>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <div class="bottom-strip"></div>
+</body>
+</html>

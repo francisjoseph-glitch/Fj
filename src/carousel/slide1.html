@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>Slide 1 – Cover</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1080px; overflow: hidden;
+    background: #FFCC00;
+    font-family: 'Poppins', sans-serif;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+  }
+
+  /* background geometric accent */
+  .bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.12;
+    background: #000;
+  }
+  .bg-circle.large  { width: 700px; height: 700px; top: -200px; right: -200px; }
+  .bg-circle.medium { width: 400px; height: 400px; bottom: -120px; left: -100px; }
+
+  .content {
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    z-index: 2;
+    padding: 0 80px;
+  }
+
+  .tag {
+    background: #000;
+    color: #FFCC00;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 10px 28px;
+    border-radius: 50px;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 96px;
+    font-weight: 900;
+    color: #000;
+    line-height: 1.0;
+    margin-bottom: 28px;
+  }
+
+  .sub {
+    font-size: 32px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 60px;
+  }
+
+  .divider {
+    width: 80px; height: 6px;
+    background: #000;
+    border-radius: 3px;
+    margin-bottom: 60px;
+  }
+
+  .avatar-row {
+    display: flex; align-items: center; gap: 20px;
+  }
+
+  .avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: #000;
+    border: 5px solid #000;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .avatar svg { width: 70px; height: 70px; }
+
+  .handle {
+    font-size: 26px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  /* bottom strip */
+  .bottom-strip {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 12px;
+    background: #000;
+  }
+</style>
+</head>
+<body>
+  <div class="bg-circle large"></div>
+  <div class="bg-circle medium"></div>
+
+  <div class="content">
+    <div class="tag">CommBank Guide</div>
+    <h1>Your<br>Finance<br>Playbook 💛</h1>
+    <div class="divider"></div>
+    <p class="sub">Tips, insights &amp; features<br>you need to know</p>
+    <div class="avatar-row">
+      <div class="avatar">
+        <!-- silhouette placeholder -->
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="28" r="16" fill="#FFCC00"/>
+          <ellipse cx="40" cy="62" rx="24" ry="16" fill="#FFCC00"/>
+        </svg>
+      </div>
+      <span class="handle">@yourhandle</span>
+    </div>
+  </div>
+
+  <div class="bottom-strip"></div>
+</body>
+</html>
