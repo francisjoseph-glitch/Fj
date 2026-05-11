@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OzPay101 – Australian Pay Calculator | Take-Home, Tax &amp; Super</title>
+  <meta name="description" content="Free Australian pay calculator. Instantly calculate your take-home pay, income tax, Medicare levy, HECS/HELP repayment, and superannuation for 2025–26." />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f4f0;
+      color: #1a2e1a;
+      line-height: 1.5;
+    }
+
+    /* ─── Design Tokens ────────────────────────────────────────── */
+    :root {
+      --green-dark:   #1a5c2a;
+      --green-mid:    #2d8a44;
+      --green-light:  #4ab55e;
+      --green-pale:   #e8f5eb;
+      --gold:         #f0a500;
+      --gold-light:   #fff3cc;
+      --navy:         #0d2137;
+      --text-primary: #1a2e1a;
+      --text-muted:   #5a6e5a;
+      --border:       #ccd8cc;
+      --white:        #ffffff;
+      --radius:       10px;
+      --shadow:       0 2px 12px rgba(0,0,0,.10);
+      --shadow-md:    0 4px 24px rgba(0,0,0,.13);
+    }
+
+    /* ─── Header ───────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, #0f3d1f 100%);
+      color: var(--white);
+      padding: 0;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: var(--gold);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: var(--green-dark);
+    }
+    .logo-text { line-height: 1.1; }
+    .logo-text .brand   { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-text .tagline { font-size: 0.72rem; opacity: 0.8; letter-spacing: 0.3px; }
+    nav { display: flex; gap: 24px; align-items: center; }
+    nav a {
+      color: rgba(255,255,255,.85);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color .15s;
+    }
+    nav a:hover { color: var(--gold); }
+    .badge-year {
+      background: var(--gold);
+      color: var(--green-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+
+    /* ─── Hero strip ───────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+      color: var(--white);
+      text-align: center;
+      padding: 36px 24px 48px;
+    }
+    .hero h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .hero p  { font-size: 1.05rem; opacity: 0.88; max-width: 520px; margin: 0 auto; }
+    .hero-pills {
+      margin-top: 18px;
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    }
+    .pill {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ─── Main layout ──────────────────────────────────────────── */
+    main { max-width: 1100px; margin: -28px auto 0; padding: 0 20px 60px; }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ─── Card ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--green-dark);
+      color: var(--white);
+      padding: 14px 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-header .icon { font-size: 1rem; }
+    .card-body { padding: 20px; }
+
+    /* ─── Form elements ─────────────────────────────────────────── */
+    .form-group { margin-bottom: 16px; }
+    .form-group:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .input-wrap { position: relative; }
+    .input-prefix {
+      position: absolute;
+      left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; font-weight: 700; color: var(--green-dark);
+      pointer-events: none;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 11px 12px 11px 28px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: #fafff8;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+    input[type="number"]:focus, select:focus {
+      outline: none;
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(45,138,68,.15);
+    }
+    select { padding-left: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d8a44' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; padding-right: 34px; }
+
+    /* Toggle / switch */
+    .toggle-group { display: flex; flex-direction: column; gap: 10px; }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #f7fbf7;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+    }
+    .toggle-row .toggle-label { font-size: 0.9rem; font-weight: 500; }
+    .toggle-row .toggle-sub   { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0;
+      background: #ccc; border-radius: 24px;
+      cursor: pointer; transition: background .2s;
+    }
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; bottom: 3px;
+      background: white; border-radius: 50%;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .switch input:checked + .slider { background: var(--green-mid); }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+
+    /* Frequency pills */
+    .freq-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .freq-btn {
+      padding: 8px 4px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+    }
+    .freq-btn:hover { border-color: var(--green-mid); color: var(--green-dark); }
+    .freq-btn.active { background: var(--green-dark); border-color: var(--green-dark); color: white; }
+
+    /* Calc button */
+    .btn-calc {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: opacity .15s, transform .1s;
+      margin-top: 18px;
+    }
+    .btn-calc:hover   { opacity: .92; }
+    .btn-calc:active  { transform: scale(.99); }
+
+    /* ─── Results ───────────────────────────────────────────────── */
+    .results-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .results-placeholder .emoji { font-size: 3rem; margin-bottom: 12px; }
+    .results-placeholder p { font-size: 0.92rem; max-width: 260px; }
+
+    /* Take-home hero */
+    .takehome-hero {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: white;
+      padding: 24px 24px 20px;
+      text-align: center;
+    }
+    .takehome-hero .label  { font-size: 0.8rem; opacity: .8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .takehome-hero .amount { font-size: 3rem; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin: 4px 0; }
+    .takehome-hero .per    { font-size: 0.85rem; opacity: .75; }
+
+    /* Breakdown table */
+    .breakdown { padding: 0; }
+    .breakdown-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid #f0f5f0;
+      gap: 8px;
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-row .br-label { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .breakdown-row .br-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .breakdown-row .br-val   { font-size: 0.95rem; font-weight: 700; text-align: right; }
+    .breakdown-row.subtotal  { background: var(--green-pale); }
+    .breakdown-row.subtotal .br-label { font-weight: 700; color: var(--text-primary); }
+    .breakdown-row.subtotal .br-val   { color: var(--green-dark); }
+
+    /* Period tabs */
+    .period-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #f0f5f0;
+      background: #fafff8;
+    }
+    .period-tab {
+      flex: 1; padding: 10px 8px;
+      font-size: 0.8rem; font-weight: 600;
+      border: none; background: none; cursor: pointer;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      margin-bottom: -2px; transition: all .15s;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .period-tab.active { color: var(--green-dark); border-bottom-color: var(--green-dark); background: white; }
+
+    /* Donut chart */
+    .chart-wrap {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border-top: 1px solid #f0f5f0;
+    }
+    .donut-container { flex-shrink: 0; }
+    .donut-svg { overflow: visible; }
+    .chart-legend { flex: 1; }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.82rem; margin-bottom: 6px;
+    }
+    .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .legend-item .leg-val { margin-left: auto; font-weight: 700; color: var(--text-primary); }
+
+    /* Smart insights */
+    .insights { padding: 16px 20px; border-top: 1px solid #f0f5f0; }
+    .insights-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; }
+    .insight-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-pale);
+      border: 1px solid #c5e0c9;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin: 3px 3px 3px 0;
+      color: var(--green-dark);
+    }
+
+    /* Period breakdown table */
+    .period-table { width: 100%; border-collapse: collapse; }
+    .period-table th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); font-weight: 600; padding: 8px 16px; text-align: right; border-bottom: 1px solid var(--border); background: #fafff8; }
+    .period-table th:first-child { text-align: left; }
+    .period-table td { font-size: 0.9rem; padding: 10px 16px; text-align: right; border-bottom: 1px solid #f0f5f0; }
+    .period-table td:first-child { text-align: left; font-weight: 500; color: var(--text-muted); }
+    .period-table tr:last-child td { font-weight: 700; color: var(--green-dark); border-bottom: none; background: var(--green-pale); }
+    .period-table tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); }
+    .period-table tr:last-child td:last-child  { border-radius: 0 0 var(--radius) 0; }
+
+    /* ─── Living Expenses ───────────────────────────────────────── */
+    .section-heading {
+      max-width: 1100px;
+      margin: 40px auto 14px;
+      padding: 0 20px;
+    }
+    .section-heading h2 { font-size: 1.5rem; font-weight: 800; color: var(--green-dark); }
+    .section-heading p  { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+
+    .expenses-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .expense-categories { display: flex; flex-direction: column; gap: 14px; }
+    .expense-cat {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .expense-cat-header {
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 0.9rem;
+      border-bottom: 1px solid #f0f5f0;
+    }
+    .cat-icon { font-size: 1.2rem; }
+    .expense-items { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .expense-item { display: flex; align-items: center; gap: 12px; }
+    .expense-item label {
+      flex: 1; font-size: 0.88rem; color: var(--text-muted);
+      text-transform: none; letter-spacing: 0; font-weight: 400; margin: 0;
+    }
+    .expense-item .exp-input-wrap { position: relative; width: 140px; flex-shrink: 0; }
+    .expense-item .exp-input-wrap .input-prefix { font-size: 0.9rem; color: #888; }
+    .expense-item input[type="number"] {
+      padding: 8px 8px 8px 24px;
+      font-size: 0.9rem; font-weight: 500;
+      background: #fafff8;
+    }
+    .exp-freq-sel {
+      padding: 8px 28px 8px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: #fafff8;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      background-size: 13px;
+      cursor: pointer;
+      width: 100px;
+    }
+
+    /* Expense summary card */
+    .expense-summary .card-body { padding: 0; }
+    .exp-income-bar { padding: 20px; background: var(--green-pale); border-bottom: 1px solid #d6ecd9; }
+    .exp-income-bar .label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+    .exp-income-bar .value { font-size: 1.5rem; font-weight: 800; color: var(--green-dark); }
+    .exp-income-bar .sub   { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    .exp-list { padding: 12px 16px; border-bottom: 1px solid #f0f5f0; }
+    .exp-list-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 0;
+      font-size: 0.85rem;
+    }
+    .exp-list-row .el-label { color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .exp-list-row .el-val   { font-weight: 600; }
+    .exp-total-row {
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fff8e6; border-bottom: 1px solid #ffe69c;
+    }
+    .exp-total-row .label { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+    .exp-total-row .value { font-size: 1.1rem; font-weight: 800; color: #a06000; }
+
+    .exp-surplus {
+      padding: 16px;
+      text-align: center;
+    }
+    .exp-surplus .surplus-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .exp-surplus .surplus-val {
+      font-size: 2rem; font-weight: 800; line-height: 1;
+      margin-bottom: 4px;
+    }
+    .exp-surplus .surplus-val.positive { color: var(--green-mid); }
+    .exp-surplus .surplus-val.negative { color: #dc3545; }
+    .exp-surplus .surplus-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Progress bar */
+    .exp-bar-wrap { padding: 12px 16px; border-top: 1px solid #f0f5f0; }
+    .exp-bar-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; }
+    .exp-bar-track { background: #e8f5eb; border-radius: 6px; height: 10px; overflow: hidden; }
+    .exp-bar-fill  { height: 100%; border-radius: 6px; transition: width .4s ease; }
+
+    .add-row-btn {
+      border: 1.5px dashed var(--border);
+      background: none;
+      width: 100%;
+      padding: 9px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .15s;
+      margin-top: 4px;
+    }
+    .add-row-btn:hover { border-color: var(--green-mid); color: var(--green-dark); background: var(--green-pale); }
+
+    /* ─── Footer ────────────────────────────────────────────────── */
+    footer {
+      background: var(--green-dark);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 0.8rem;
+      line-height: 1.7;
+    }
+    footer strong { color: white; }
+    footer a { color: var(--gold); text-decoration: none; }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .calculator-grid { grid-template-columns: 1fr; }
+      .expenses-grid   { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 1.6rem; }
+      .takehome-hero .amount { font-size: 2.2rem; }
+      nav { display: none; }
+    }
+    @media (max-width: 480px) {
+      .freq-group { grid-template-columns: repeat(2, 1fr); }
+      .chart-wrap { flex-direction: column; }
+    }
+
+    /* ─── Hidden ────────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .results-panel { transition: opacity .2s; }
+
+    /* ─── Tooltip ───────────────────────────────────────────────── */
+    [data-tip] { position: relative; cursor: help; }
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+      background: var(--navy); color: white;
+      padding: 6px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 400;
+      white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity .15s; z-index: 10;
+    }
+    [data-tip]:hover::after { opacity: 1; }
+
+    /* ─── Animation ─────────────────────────────────────────────── */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeIn .35s ease forwards; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">$</div>
+      <div class="logo-text">
+        <div class="brand">OzPay<span style="color:var(--gold)">101</span></div>
+        <div class="tagline">Australian Pay Calculator</div>
+      </div>
+    </a>
+    <nav>
+      <a href="#calculator">Calculator</a>
+      <a href="#expenses">Expenses</a>
+      <a href="#" onclick="return false">Tax Rates</a>
+      <a href="#" onclick="return false">About</a>
+      <span class="badge-year">2025–26</span>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="hero">
+  <h1>Your Take-Home Pay, Calculated Instantly</h1>
+  <p>Salary, tax, super &amp; HECS breakdowns for 2025–26. Updated with the latest ATO rates.</p>
+  <div class="hero-pills">
+    <span class="pill">✓ Income Tax</span>
+    <span class="pill">✓ Medicare Levy</span>
+    <span class="pill">✓ HECS / HELP</span>
+    <span class="pill">✓ Superannuation</span>
+    <span class="pill">✓ Living Expenses</span>
+  </div>
+</div>
+
+<!-- ═══════════════════ CALCULATOR ═══════════════════ -->
+<main id="calculator">
+  <div class="calculator-grid">
+
+    <!-- ── Input panel ── -->
+    <div class="card">
+      <div class="card-header"><span class="icon">⚙️</span> Calculator Inputs</div>
+      <div class="card-body">
+
+        <div class="form-group">
+          <label>Gross Income</label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input type="number" id="income" value="75000" min="0" max="9999999" step="1000" placeholder="e.g. 75000" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Income Frequency</label>
+          <div class="freq-group">
+            <button class="freq-btn" data-freq="weekly">Weekly</button>
+            <button class="freq-btn" data-freq="fortnightly">Fortnightly</button>
+            <button class="freq-btn" data-freq="monthly">Monthly</button>
+            <button class="freq-btn active" data-freq="annually">Annually</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Residency Status</label>
+          <select id="residency">
+            <option value="resident">Australian Resident</option>
+            <option value="nonresident">Non-Resident</option>
+            <option value="whm">Working Holiday Maker</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Tax Year</label>
+          <select id="taxyear">
+            <option value="2526">2025–26 (Current)</option>
+            <option value="2425">2024–25</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Superannuation</label>
+          <select id="superMode">
+            <option value="inclusive">Inclusive (salary includes super)</option>
+            <option value="exclusive">Exclusive (employer pays on top)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Options</label>
+          <div class="toggle-group">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label" data-tip="Higher Education Loan Program / VET Student Loan">HECS / HELP Debt</div>
+                <div class="toggle-sub">Student loan repayments</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="toggleHecs" /><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label" data-tip="Medicare Levy Surcharge applies if income > $93,000 and no private health">Private Health Cover</div>
+                <div class="toggle-sub">Avoids MLS if income &gt; $93,000</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="toggleHealth" /></label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Senior / Pensioner</div>
+                <div class="toggle-sub">Applies SAPTO offset</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="toggleSenior" /></label>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-calc" onclick="calculate()">Calculate Take-Home Pay →</button>
+      </div>
+    </div>
+
+    <!-- ── Results panel ── -->
+    <div class="card results-panel" id="resultsCard">
+      <div class="card-header"><span class="icon">💰</span> Your Pay Breakdown</div>
+
+      <!-- Placeholder when no calc yet -->
+      <div id="resultsPlaceholder" class="results-placeholder">
+        <div class="emoji">🇦🇺</div>
+        <p>Enter your income and click <strong>Calculate</strong> to see your pay breakdown.</p>
+      </div>
+
+      <!-- Actual results (hidden until calc) -->
+      <div id="resultsContent" class="hidden">
+
+        <!-- Take-home hero -->
+        <div class="takehome-hero">
+          <div class="label">Weekly Take-Home Pay</div>
+          <div class="amount" id="heroAmount">$0</div>
+          <div class="per" id="heroPer">Based on $0 annual income</div>
+        </div>
+
+        <!-- Period tabs -->
+        <div class="period-tabs" id="periodTabs">
+          <button class="period-tab active" data-period="weekly"       onclick="switchPeriod('weekly',this)">Weekly</button>
+          <button class="period-tab"        data-period="fortnightly"  onclick="switchPeriod('fortnightly',this)">Fortnightly</button>
+          <button class="period-tab"        data-period="monthly"      onclick="switchPeriod('monthly',this)">Monthly</button>
+          <button class="period-tab"        data-period="annually"     onclick="switchPeriod('annually',this)">Annual</button>
+        </div>
+
+        <!-- Breakdown rows -->
+        <div class="breakdown" id="breakdownRows"></div>
+
+        <!-- Donut chart -->
+        <div class="chart-wrap">
+          <div class="donut-container">
+            <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120" id="donutSvg"></svg>
+          </div>
+          <div class="chart-legend" id="chartLegend"></div>
+        </div>
+
+        <!-- Full period table -->
+        <div style="padding:0 0 0 0; overflow:auto;">
+          <table class="period-table" id="periodTable"></table>
+        </div>
+
+        <!-- Smart insights -->
+        <div class="insights" id="smartInsights"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══════════════════ LIVING EXPENSES ═══════════════════ -->
+<div class="section-heading" id="expenses">
+  <h2>🏠 Living Expenses Budget Template</h2>
+  <p>Track your monthly expenses and see how much you have left from your take-home pay.</p>
+</div>
+
+<div class="expenses-grid">
+
+  <!-- Categories -->
+  <div class="expense-categories" id="expenseCategories">
+
+    <!-- Housing -->
+    <div class="expense-cat">
+      <div class="expense-cat-header" style="background:#e8f5eb; color:#1a5c2a;">
+        <span class="cat-icon">🏠</span> Housing &amp; Utilities
+      </div>
+      <div class="expense-items">
+        <div class="expense-item">
+          <label>Rent / Mortgage</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="housing" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Electricity &amp; Gas</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="housing" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Water</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="housing" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Internet / Phone</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="housing" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <button class="add-row-btn" onclick="addExpenseRow(this,'housing')">+ Add row</button>
+      </div>
+    </div>
+
+    <!-- Food -->
+    <div class="expense-cat">
+      <div class="expense-cat-header" style="background:#fff3e0; color:#7b4000;">
+        <span class="cat-icon">🛒</span> Food &amp; Groceries
+      </div>
+      <div class="expense-items">
+        <div class="expense-item">
+          <label>Groceries</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="food" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly" selected>weekly</option><option value="fortnightly">fort.</option><option value="monthly">monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Dining Out / Takeaway</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="food" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly" selected>weekly</option><option value="fortnightly">fort.</option><option value="monthly">monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Coffee / Snacks</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="food" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly" selected>weekly</option><option value="fortnightly">fort.</option><option value="monthly">monthly</option><option value="annually">annual</option></select>
+        </div>
+        <button class="add-row-btn" onclick="addExpenseRow(this,'food')">+ Add row</button>
+      </div>
+    </div>
+
+    <!-- Transport -->
+    <div class="expense-cat">
+      <div class="expense-cat-header" style="background:#e3f2fd; color:#0d47a1;">
+        <span class="cat-icon">🚗</span> Transport
+      </div>
+      <div class="expense-items">
+        <div class="expense-item">
+          <label>Fuel</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="transport" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly" selected>weekly</option><option value="fortnightly">fort.</option><option value="monthly">monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Car Insurance &amp; Rego</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="transport" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly">monthly</option><option value="annually" selected>annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Public Transport</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="transport" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly" selected>weekly</option><option value="fortnightly">fort.</option><option value="monthly">monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Car Loan / Lease</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="transport" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <button class="add-row-btn" onclick="addExpenseRow(this,'transport')">+ Add row</button>
+      </div>
+    </div>
+
+    <!-- Insurance & Health -->
+    <div class="expense-cat">
+      <div class="expense-cat-header" style="background:#fce4ec; color:#880e4f;">
+        <span class="cat-icon">🏥</span> Insurance &amp; Health
+      </div>
+      <div class="expense-items">
+        <div class="expense-item">
+          <label>Private Health Insurance</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="insurance" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Life / Income Protection</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="insurance" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>GP / Dentist / Prescriptions</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="insurance" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <button class="add-row-btn" onclick="addExpenseRow(this,'insurance')">+ Add row</button>
+      </div>
+    </div>
+
+    <!-- Personal & Entertainment -->
+    <div class="expense-cat">
+      <div class="expense-cat-header" style="background:#ede7f6; color:#4527a0;">
+        <span class="cat-icon">🎭</span> Personal &amp; Entertainment
+      </div>
+      <div class="expense-items">
+        <div class="expense-item">
+          <label>Streaming (Netflix, Spotify…)</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="personal" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Gym / Sports</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="personal" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Clothing &amp; Personal Care</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="personal" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Entertainment / Holidays</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="personal" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <button class="add-row-btn" onclick="addExpenseRow(this,'personal')">+ Add row</button>
+      </div>
+    </div>
+
+    <!-- Savings & Debt -->
+    <div class="expense-cat">
+      <div class="expense-cat-header" style="background:#e8f5e9; color:#1b5e20;">
+        <span class="cat-icon">💳</span> Savings &amp; Debt
+      </div>
+      <div class="expense-items">
+        <div class="expense-item">
+          <label>Savings / Emergency Fund</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="savings" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Credit Card Payments</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="savings" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Personal Loans</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="savings" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <div class="expense-item">
+          <label>Investments / Super Extra</label>
+          <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="savings" placeholder="0" /></div>
+          <select class="exp-freq-sel"><option value="weekly">weekly</option><option value="fortnightly">fort.</option><option value="monthly" selected>monthly</option><option value="annually">annual</option></select>
+        </div>
+        <button class="add-row-btn" onclick="addExpenseRow(this,'savings')">+ Add row</button>
+      </div>
+    </div>
+
+  </div><!-- /expense-categories -->
+
+  <!-- ── Expense Summary ── -->
+  <div class="card expense-summary" id="expenseSummary">
+    <div class="card-header"><span class="icon">📊</span> Budget Summary</div>
+    <div class="card-body">
+
+      <div class="exp-income-bar">
+        <div class="label">Monthly Take-Home Pay</div>
+        <div class="value" id="expTakeHome">—</div>
+        <div class="sub" id="expTakeHomeSub">Calculate your pay first ↑</div>
+      </div>
+
+      <div class="exp-list" id="expCatList">
+        <div class="exp-list-row"><span class="el-label"><span style="color:#1a5c2a">●</span> Housing &amp; Utilities</span><span class="el-val" id="sumHousing">$0</span></div>
+        <div class="exp-list-row"><span class="el-label"><span style="color:#e65100">●</span> Food &amp; Groceries</span><span class="el-val" id="sumFood">$0</span></div>
+        <div class="exp-list-row"><span class="el-label"><span style="color:#1565c0">●</span> Transport</span><span class="el-val" id="sumTransport">$0</span></div>
+        <div class="exp-list-row"><span class="el-label"><span style="color:#880e4f">●</span> Insurance &amp; Health</span><span class="el-val" id="sumInsurance">$0</span></div>
+        <div class="exp-list-row"><span class="el-label"><span style="color:#4527a0">●</span> Personal &amp; Entertainment</span><span class="el-val" id="sumPersonal">$0</span></div>
+        <div class="exp-list-row"><span class="el-label"><span style="color:#1b5e20">●</span> Savings &amp; Debt</span><span class="el-val" id="sumSavings">$0</span></div>
+      </div>
+
+      <div class="exp-total-row">
+        <span class="label">Total Monthly Expenses</span>
+        <span class="value" id="expTotalCost">$0</span>
+      </div>
+
+      <div class="exp-surplus">
+        <div class="surplus-label">Monthly Surplus / Deficit</div>
+        <div class="surplus-val" id="surplusVal">—</div>
+        <div class="surplus-sub" id="surplusSub">Enter expenses to see budget balance</div>
+      </div>
+
+      <div class="exp-bar-wrap">
+        <div class="exp-bar-labels">
+          <span>Expenses</span>
+          <span id="expPct">0%</span>
+        </div>
+        <div class="exp-bar-track">
+          <div class="exp-bar-fill" id="expBarFill" style="width:0%; background: var(--green-mid);"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /expenses-grid -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <strong>OzPay101</strong> — Australian Pay Calculator &amp; Expense Tracker<br/>
+  Figures are estimates only based on 2025–26 ATO tax rates. Not financial advice.<br/>
+  Tax rates sourced from the <a href="https://www.ato.gov.au" target="_blank">Australian Taxation Office</a>.
+</footer>
+
+<!-- ═══════════════════ SCRIPT ═══════════════════ -->
+<script>
+  /* ─────────────────────────────────────────────
+     STATE
+  ───────────────────────────────────────────── */
+  let state = {
+    annual: 0, tax: 0, medicare: 0, mls: 0,
+    hecs: 0, super: 0, net: 0,
+    freq: 'annually', period: 'weekly'
+  };
+
+  /* ─────────────────────────────────────────────
+     HELPERS
+  ───────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
+  const fmt = (n, abs) => {
+    const v = abs ? Math.abs(n) : n;
+    return new Intl.NumberFormat('en-AU', { style:'currency', currency:'AUD', maximumFractionDigits:0 }).format(v);
+  };
+  const fmtPct = pct => pct.toFixed(1) + '%';
+  const toAnnual = (val, freq) => {
+    const f = { weekly:52, fortnightly:26, monthly:12, annually:1 };
+    return val * (f[freq] || 1);
+  };
+  const fromAnnual = (val, freq) => {
+    const f = { weekly:52, fortnightly:26, monthly:12, annually:1 };
+    return val / (f[freq] || 1);
+  };
+
+  /* ─────────────────────────────────────────────
+     TAX CALCULATIONS  (2025-26 ATO rates)
+  ───────────────────────────────────────────── */
+
+  /** Resident income tax – Stage 3 + 2025 Budget 15% cut */
+  function residentTax(income, year) {
+    if (year === '2526') {
+      // 2025-26: 15% on $18,201-$45,000 (1% cut from 2024-25)
+      if (income <= 18200)           return 0;
+      if (income <= 45000)           return (income - 18200) * 0.15;
+      if (income <= 135000)          return 4020 + (income - 45000) * 0.30;
+      if (income <= 190000)          return 31020 + (income - 135000) * 0.37;
+      return 51370 + (income - 190000) * 0.45;
+    } else {
+      // 2024-25: 16%
+      if (income <= 18200)           return 0;
+      if (income <= 45000)           return (income - 18200) * 0.16;
+      if (income <= 135000)          return 4288 + (income - 45000) * 0.30;
+      if (income <= 190000)          return 31288 + (income - 135000) * 0.37;
+      return 51638 + (income - 190000) * 0.45;
+    }
+  }
+
+  /** Non-resident income tax */
+  function nonResidentTax(income) {
+    if (income <= 135000)            return income * 0.30;
+    if (income <= 190000)            return 40500 + (income - 135000) * 0.37;
+    return 60850 + (income - 190000) * 0.45;
+  }
+
+  /** Working Holiday Maker */
+  function whmTax(income) {
+    if (income <= 45000)             return income * 0.15;
+    if (income <= 135000)            return 6750 + (income - 45000) * 0.30;
+    if (income <= 190000)            return 33750 + (income - 135000) * 0.37;
+    return 54100 + (income - 190000) * 0.45;
+  }
+
+  /** Low Income Tax Offset (residents only) */
+  function lito(income) {
+    if (income <= 37500)             return 700;
+    if (income <= 45000)             return 700 - (income - 37500) * 0.05;
+    if (income <= 66667)             return 325 - (income - 45000) * 0.015;
+    return 0;
+  }
+
+  /** SAPTO (seniors) – simplified */
+  function sapto(income) {
+    if (income <= 32279)             return 2230;
+    if (income <= 50119)             return Math.max(0, 2230 - (income - 32279) * 0.125);
+    return 0;
+  }
+
+  /** Medicare Levy (residents) */
+  function medicareLevy(income, isSenior) {
+    const lower = isSenior ? 36705 : 26000;
+    const upper = isSenior ? 45881 : 32500;
+    if (income <= lower)             return 0;
+    if (income <= upper)             return (income - lower) * 0.10;
+    return income * 0.02;
+  }
+
+  /** Medicare Levy Surcharge */
+  function medicareLevySurcharge(income, hasHealth) {
+    if (hasHealth || income <= 93000) return 0;
+    if (income <= 108000)            return income * 0.010;
+    if (income <= 144000)            return income * 0.0125;
+    return income * 0.015;
+  }
+
+  /** HECS / HELP repayment (2024-25 thresholds) */
+  function hecsRepayment(income) {
+    const brackets = [
+      [54435,  0.010], [62740,  0.020], [70619,  0.025],
+      [75000,  0.030], [86518,  0.035], [91337,  0.040],
+      [107368, 0.045], [114129, 0.050], [135925, 0.055],
+      [155375, 0.060], [175288, 0.065], [183003, 0.070],
+      [200001, 0.075]
+    ];
+    let rate = 0;
+    for (const [thresh, r] of brackets) {
+      if (income >= thresh) rate = r; else break;
+    }
+    return income * rate;
+  }
+
+  /* ─────────────────────────────────────────────
+     MAIN CALCULATE
+  ───────────────────────────────────────────── */
+  function calculate() {
+    const rawIncome  = parseFloat($('income').value) || 0;
+    const freq       = document.querySelector('.freq-btn.active')?.dataset.freq || 'annually';
+    const annualIncome = toAnnual(rawIncome, freq);
+    const residency  = $('residency').value;
+    const year       = $('taxyear').value;
+    const superMode  = $('superMode').value;
+    const hasHecs    = $('toggleHecs').checked;
+    const hasHealth  = $('toggleHealth').checked;
+    const isSenior   = $('toggleSenior').checked;
+
+    // Super: 11.5% SG rate
+    const superRate = 0.115;
+    let grossForTax, superAmount;
+
+    if (superMode === 'inclusive') {
+      // Salary already includes super component
+      grossForTax  = annualIncome / (1 + superRate);
+      superAmount  = annualIncome - grossForTax;
+    } else {
+      grossForTax  = annualIncome;
+      superAmount  = annualIncome * superRate;
+    }
+
+    // Tax
+    let incomeTax;
+    if      (residency === 'nonresident') incomeTax = nonResidentTax(grossForTax);
+    else if (residency === 'whm')         incomeTax = whmTax(grossForTax);
+    else {
+      incomeTax = residentTax(grossForTax, year);
+      incomeTax = Math.max(0, incomeTax - lito(grossForTax));
+      if (isSenior) incomeTax = Math.max(0, incomeTax - sapto(grossForTax));
+    }
+
+    const medLevy  = residency === 'resident' ? medicareLevy(grossForTax, isSenior) : 0;
+    const mlsSurch = residency === 'resident' ? medicareLevySurcharge(grossForTax, hasHealth) : 0;
+    const hecsAmt  = hasHecs ? hecsRepayment(grossForTax) : 0;
+
+    const netAnnual = grossForTax - incomeTax - medLevy - mlsSurch - hecsAmt;
+    const effectiveRate = grossForTax > 0 ? ((incomeTax + medLevy + mlsSurch) / grossForTax * 100) : 0;
+    const marginalRate  = getMarginalRate(grossForTax, residency, year);
+
+    state = {
+      gross: grossForTax, annualIncome, superAmount,
+      tax: incomeTax, medicare: medLevy, mls: mlsSurch,
+      hecs: hecsAmt, net: netAnnual,
+      effectiveRate, marginalRate,
+      freq, period: 'weekly', hasHecs, hasHealth,
+      residency, isSenior
+    };
+
+    renderResults();
+    updateExpenseSummary();
+  }
+
+  function getMarginalRate(income, res, year) {
+    if (res === 'nonresident') {
+      if (income <= 135000) return 30; if (income <= 190000) return 37; return 45;
+    }
+    if (res === 'whm') {
+      if (income <= 45000) return 15; if (income <= 135000) return 30; if (income <= 190000) return 37; return 45;
+    }
+    const base = year === '2526' ? 15 : 16;
+    if (income <= 18200)  return 0;
+    if (income <= 45000)  return base;
+    if (income <= 135000) return 30;
+    if (income <= 190000) return 37;
+    return 45;
+  }
+
+  /* ─────────────────────────────────────────────
+     RENDER RESULTS
+  ───────────────────────────────────────────── */
+  function renderResults() {
+    $('resultsPlaceholder').classList.add('hidden');
+    const rc = $('resultsContent');
+    rc.classList.remove('hidden');
+    rc.classList.add('animate-in');
+
+    const period = state.period;
+    const div    = f => fromAnnual(f, period);
+
+    // Hero
+    $('heroAmount').textContent = fmt(div(state.net));
+    $('heroPer').textContent    = `Based on ${fmt(state.gross)} annual gross`;
+
+    // Breakdown rows
+    const rows = [
+      { label:'Gross Income',     dot:'#2d8a44', val: div(state.gross),       positive: true  },
+      { label:'Income Tax',       dot:'#e53935', val: div(state.tax),          positive: false },
+      { label:'Medicare Levy',    dot:'#fb8c00', val: div(state.medicare + state.mls), positive: false },
+      ...(state.hasHecs ? [{ label:'HECS / HELP Repayment', dot:'#8e24aa', val: div(state.hecs), positive: false }] : []),
+      { label:'Superannuation (employer)', dot:'#1e88e5', val: div(state.superAmount), positive: true, note: true },
+      { label:'Take-Home Pay',    dot:'#1a5c2a', val: div(state.net),          positive: true, subtotal: true },
+    ];
+
+    const bEl = $('breakdownRows');
+    bEl.innerHTML = rows.map(r => `
+      <div class="breakdown-row ${r.subtotal ? 'subtotal' : ''}">
+        <span class="br-label">
+          <span class="br-dot" style="background:${r.dot}"></span>
+          ${r.label}${r.note ? ' <span style="font-size:.75rem;opacity:.7">(not withheld)</span>' : ''}
+        </span>
+        <span class="br-val" style="color:${r.positive ? 'var(--green-dark)' : '#c62828'}">
+          ${r.positive ? '' : '−'}${fmt(r.val, true)}
+        </span>
+      </div>`).join('');
+
+    // Period table
+    const periods = ['weekly','fortnightly','monthly','annually'];
+    const pLabels = { weekly:'Weekly', fortnightly:'Fortnightly', monthly:'Monthly', annually:'Annual' };
+    const tableRows = [
+      ['Gross Income', state.gross],
+      ['Income Tax', -state.tax],
+      ['Medicare Levy', -(state.medicare + state.mls)],
+      ...(state.hasHecs ? [['HECS / HELP', -state.hecs]] : []),
+      ['Take-Home Pay', state.net],
+    ];
+    $('periodTable').innerHTML = `
+      <thead><tr>
+        <th>Deduction</th>
+        ${periods.map(p => `<th>${pLabels[p]}</th>`).join('')}
+      </tr></thead>
+      <tbody>
+        ${tableRows.map(([label, annVal]) => `
+          <tr>
+            <td>${label}</td>
+            ${periods.map(p => `<td style="color:${annVal<0?'#c62828':'var(--green-dark)'}">${fmt(fromAnnual(annVal, p), true)}</td>`).join('')}
+          </tr>`).join('')}
+      </tbody>`;
+
+    // Donut chart
+    drawDonut();
+
+    // Insights
+    renderInsights();
+
+    // Update period tab hero
+    updatePeriodHero();
+  }
+
+  function switchPeriod(p, btn) {
+    state.period = p;
+    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    updatePeriodHero();
+    if (!$('resultsContent').classList.contains('hidden')) renderResults();
+  }
+
+  function updatePeriodHero() {
+    const labels = { weekly:'Weekly', fortnightly:'Fortnightly', monthly:'Monthly', annually:'Annual' };
+    $('heroAmount').textContent = fmt(fromAnnual(state.net || 0, state.period));
+    $('heroPer').textContent    = `${labels[state.period]} take-home pay`;
+  }
+
+  /* ─────────────────────────────────────────────
+     DONUT CHART
+  ───────────────────────────────────────────── */
+  function drawDonut() {
+    const segments = [
+      { label:'Take-Home',     val: state.net,                       color:'#2d8a44' },
+      { label:'Income Tax',    val: state.tax,                       color:'#e53935' },
+      { label:'Medicare',      val: state.medicare + state.mls,      color:'#fb8c00' },
+      ...(state.hasHecs ? [{ label:'HECS', val: state.hecs, color:'#8e24aa' }] : []),
+      { label:'Super',         val: state.superAmount,               color:'#1e88e5' },
+    ];
+
+    const total  = segments.reduce((s, sg) => s + sg.val, 0);
+    const cx = 60, cy = 60, r = 45, ir = 28;
+    const circumference = 2 * Math.PI * r;
+    let offset = -Math.PI / 2;
+
+    let paths = '';
+    for (const sg of segments) {
+      const frac  = total > 0 ? sg.val / total : 0;
+      const angle = frac * 2 * Math.PI;
+      const x1 = cx + r * Math.cos(offset);
+      const y1 = cy + r * Math.sin(offset);
+      const x2 = cx + r * Math.cos(offset + angle);
+      const y2 = cy + r * Math.sin(offset + angle);
+      const xi1 = cx + ir * Math.cos(offset);
+      const yi1 = cy + ir * Math.sin(offset);
+      const xi2 = cx + ir * Math.cos(offset + angle);
+      const yi2 = cy + ir * Math.sin(offset + angle);
+      const large = angle > Math.PI ? 1 : 0;
+      paths += `<path d="M${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} L${xi2},${yi2} A${ir},${ir} 0 ${large},0 ${xi1},${yi1} Z" fill="${sg.color}" opacity="0.9" />`;
+      offset += angle;
+    }
+
+    $('donutSvg').innerHTML = paths +
+      `<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#1a5c2a" font-size="9" font-weight="700">Take-Home</text>
+       <text x="${cx}" y="${cy+8}" text-anchor="middle" fill="#1a5c2a" font-size="11" font-weight="800">${fmtPct((state.gross>0?state.net/state.gross:0)*100)}</text>`;
+
+    $('chartLegend').innerHTML = segments.map(sg => `
+      <div class="legend-item">
+        <span class="legend-swatch" style="background:${sg.color}"></span>
+        <span>${sg.label}</span>
+        <span class="leg-val">${fmtPct(total > 0 ? sg.val/total*100 : 0)}</span>
+      </div>`).join('');
+  }
+
+  /* ─────────────────────────────────────────────
+     SMART INSIGHTS
+  ───────────────────────────────────────────── */
+  function renderInsights() {
+    const g = state.gross;
+    const chips = [];
+
+    chips.push(`📊 Effective rate: <strong>${fmtPct(state.effectiveRate)}</strong>`);
+    chips.push(`📈 Marginal rate: <strong>${state.marginalRate}%</strong>`);
+
+    if (g > 0 && g < 18200)   chips.push('✅ Below tax-free threshold');
+    if (g >= 180000)           chips.push('💰 Top 45% bracket');
+    if (!state.hasHecs && g > 54435) chips.push('🎓 HECS threshold reached');
+    if (!state.hasHealth && g > 93000) chips.push('🏥 MLS applies — consider private health');
+    if (state.mls > 0)         chips.push(`⚠️ MLS: ${fmt(state.mls)} p.a.`);
+    chips.push(`🏦 Super (11.5%): ${fmt(state.superAmount)} p.a.`);
+
+    $('smartInsights').innerHTML = `
+      <div class="insights-title">Smart Insights</div>
+      ${chips.map(c => `<span class="insight-chip">${c}</span>`).join('')}`;
+  }
+
+  /* ─────────────────────────────────────────────
+     FREQUENCY BUTTONS
+  ───────────────────────────────────────────── */
+  document.querySelectorAll('.freq-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  /* ─────────────────────────────────────────────
+     LIVING EXPENSES
+  ───────────────────────────────────────────── */
+  function expInputsToMonthly() {
+    const cats = {};
+    document.querySelectorAll('.exp-inp').forEach(inp => {
+      const val  = parseFloat(inp.value) || 0;
+      const cat  = inp.dataset.cat;
+      const freq = inp.closest('.expense-item')?.querySelector('.exp-freq-sel')?.value || 'monthly';
+      const monthly = toAnnual(val, freq) / 12;
+      cats[cat] = (cats[cat] || 0) + monthly;
+    });
+    return cats;
+  }
+
+  function updateExpenseSummary() {
+    const cats   = expInputsToMonthly();
+    const total  = Object.values(cats).reduce((s, v) => s + v, 0);
+    const monthly = state.net ? fromAnnual(state.net, 'monthly') : 0;
+    const surplus = monthly - total;
+    const pct     = monthly > 0 ? Math.min(100, total / monthly * 100) : 0;
+
+    // Take-home
+    if (state.net) {
+      $('expTakeHome').textContent    = fmt(monthly);
+      $('expTakeHomeSub').textContent = `Monthly net pay (after tax)`;
+    }
+
+    // Category sums
+    const catMap = { housing:'sumHousing', food:'sumFood', transport:'sumTransport',
+                     insurance:'sumInsurance', personal:'sumPersonal', savings:'sumSavings' };
+    for (const [cat, elId] of Object.entries(catMap)) {
+      const el = $(elId);
+      if (el) el.textContent = fmt(cats[cat] || 0);
+    }
+
+    // Total
+    $('expTotalCost').textContent = fmt(total);
+
+    // Surplus
+    const sv = $('surplusVal');
+    sv.textContent  = state.net ? (surplus >= 0 ? '+' : '−') + fmt(Math.abs(surplus)) : '—';
+    sv.className    = 'surplus-val ' + (surplus >= 0 ? 'positive' : 'negative');
+    $('surplusSub').textContent = state.net
+      ? (surplus >= 0 ? 'Great! You have money left over.' : 'Expenses exceed take-home pay.')
+      : 'Calculate your pay first ↑';
+
+    // Bar
+    const bar = $('expBarFill');
+    bar.style.width      = pct.toFixed(1) + '%';
+    bar.style.background = pct > 90 ? '#dc3545' : pct > 70 ? '#fb8c00' : 'var(--green-mid)';
+    $('expPct').textContent = pct.toFixed(0) + '%';
+  }
+
+  // Live update expenses on any input change
+  document.addEventListener('input', e => {
+    if (e.target.classList.contains('exp-inp') || e.target.classList.contains('exp-freq-sel')) {
+      updateExpenseSummary();
+    }
+  });
+
+  /* ─────────────────────────────────────────────
+     ADD EXPENSE ROW
+  ───────────────────────────────────────────── */
+  function addExpenseRow(btn, cat) {
+    const label = prompt('Expense name:');
+    if (!label) return;
+    const item = document.createElement('div');
+    item.className = 'expense-item';
+    item.innerHTML = `
+      <label>${label}</label>
+      <div class="exp-input-wrap"><span class="input-prefix">$</span><input type="number" class="exp-inp" data-cat="${cat}" placeholder="0" /></div>
+      <select class="exp-freq-sel">
+        <option value="weekly">weekly</option>
+        <option value="fortnightly">fort.</option>
+        <option value="monthly" selected>monthly</option>
+        <option value="annually">annual</option>
+      </select>`;
+    btn.parentElement.insertBefore(item, btn);
+  }
+
+  /* ─────────────────────────────────────────────
+     INIT: run calc on load
+  ───────────────────────────────────────────── */
+  window.addEventListener('DOMContentLoaded', () => {
+    calculate();
+  });
+</script>
+</body>
+</html>
