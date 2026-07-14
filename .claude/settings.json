@@ -173,6 +173,21 @@
       "Read(./.env.*)"
     ]
   },
+  "extraKnownMarketplaces": {
+    "claude-design-skillstack": {
+      "source": {
+        "source": "github",
+        "repo": "freshtechbro/claudedesignskills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "core-3d-animation@claude-design-skillstack": true,
+    "extended-3d-scroll@claude-design-skillstack": true,
+    "animation-components@claude-design-skillstack": true,
+    "authoring-motion@claude-design-skillstack": true,
+    "meta-skills@claude-design-skillstack": true
+  },
   "attribution": {
     "commit": "Co-Authored-By: RuFlo <ruv@ruv.net>",
     "pr": "🤖 Generated with [RuFlo](https://github.com/ruvnet/ruflo)"
