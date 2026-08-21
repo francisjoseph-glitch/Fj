@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Referral Partner Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f4f6f9;
+    color: #1c2733;
+    line-height: 1.45;
+  }
+  :root {
+    --navy: #0f2942;
+    --navy-light: #1c4166;
+    --blue: #2f6fed;
+    --blue-pale: #e9f0fe;
+    --green: #1a8a4c;
+    --green-pale: #e6f6ec;
+    --amber: #c67c05;
+    --amber-pale: #fdf2df;
+    --red: #c0392b;
+    --red-pale: #fbeae8;
+    --gray: #64748b;
+    --gray-pale: #eef1f5;
+    --border: #dbe2ea;
+    --white: #ffffff;
+    --radius: 8px;
+    --shadow: 0 1px 3px rgba(15,41,66,.08), 0 1px 2px rgba(15,41,66,.06);
+  }
+
+  header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 { font-size: 1.25rem; font-weight: 600; }
+  header .sub { font-size: .8rem; color: #b7c6da; margin-top: 2px; }
+  nav { display: flex; gap: 6px; }
+  nav button {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.25);
+    color: #dce6f5;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: .88rem;
+    font-weight: 500;
+  }
+  nav button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+  nav button:hover:not(.active) { background: rgba(255,255,255,.1); }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 20px 60px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  h2 { font-size: 1.05rem; margin-bottom: 14px; color: var(--navy); }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Dashboard */
+  .goal-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .goal-bar .count { font-size: 1.8rem; font-weight: 700; color: var(--navy); }
+  .goal-bar .label { color: var(--gray); font-size: .85rem; }
+  .cat-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .cat-pill {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: .78rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gray-pale);
+    color: var(--gray);
+  }
+  .cat-pill.won { background: var(--green-pale); color: var(--green); border-color: #bfe6cd; font-weight: 600; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: .82rem; }
+  .bar-row .bar-label { width: 130px; flex-shrink: 0; color: #3a4a5c; }
+  .bar-row .bar-track { flex: 1; background: var(--gray-pale); border-radius: 6px; height: 16px; overflow: hidden; }
+  .bar-row .bar-fill { height: 100%; background: var(--blue); border-radius: 6px; }
+  .bar-row .bar-count { width: 22px; text-align: right; color: var(--gray); font-weight: 600; }
+
+  .due-list { list-style: none; }
+  .due-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .85rem;
+  }
+  .due-item:last-child { border-bottom: none; }
+  .due-item .who { font-weight: 600; }
+  .due-item .what { color: var(--gray); font-size: .78rem; }
+  .due-date { font-size: .76rem; padding: 3px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap; }
+  .due-date.overdue { background: var(--red-pale); color: var(--red); }
+  .due-date.soon { background: var(--amber-pale); color: var(--amber); }
+  .empty-note { color: var(--gray); font-size: .85rem; padding: 6px 0; }
+
+  /* Contacts toolbar */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .toolbar input[type=text], .toolbar select {
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: .85rem; background: var(--white); color: #1c2733;
+  }
+  .toolbar input[type=text] { flex: 1; min-width: 160px; }
+  .btn {
+    padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--blue);
+    background: var(--blue); color: #fff; cursor: pointer; font-size: .85rem; font-weight: 600;
+  }
+  .btn:hover { background: #2560d6; }
+  .btn.secondary { background: var(--white); color: var(--navy); border-color: var(--border); }
+  .btn.secondary:hover { background: var(--gray-pale); }
+  .btn.danger { background: var(--white); color: var(--red); border-color: #eab8b0; }
+  .btn.danger:hover { background: var(--red-pale); }
+
+  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  thead th {
+    text-align: left; padding: 9px 10px; color: var(--gray); font-weight: 600;
+    border-bottom: 2px solid var(--border); white-space: nowrap;
+  }
+  tbody td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:hover { background: #f8fafc; }
+  .notes-cell { max-width: 200px; color: var(--gray); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-actions { display: flex; gap: 6px; white-space: nowrap; }
+  .row-actions button { font-size: .75rem; padding: 4px 9px; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: .72rem; font-weight: 600; white-space: nowrap; }
+  .badge.not_contacted { background: var(--gray-pale); color: var(--gray); }
+  .badge.engaged_social { background: var(--blue-pale); color: var(--blue); }
+  .badge.messaged { background: #ede9fe; color: #6d28d9; }
+  .badge.replied { background: #e0f2fe; color: #0369a1; }
+  .badge.call_booked { background: var(--amber-pale); color: var(--amber); }
+  .badge.active_partner { background: var(--green-pale); color: var(--green); }
+  .badge.dead { background: var(--red-pale); color: var(--red); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(15,25,40,.45);
+    align-items: center; justify-content: center; padding: 20px; z-index: 50;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--white); border-radius: 10px; padding: 24px; width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  }
+  .modal h3 { margin-bottom: 16px; color: var(--navy); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
+  label { display: block; font-size: .78rem; font-weight: 600; color: #3a4a5c; margin-bottom: 4px; }
+  input, select, textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+    font-size: .85rem; font-family: inherit; color: #1c2733;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+  /* Templates */
+  .template-card h3 { font-size: .95rem; color: var(--navy); margin-bottom: 8px; }
+  .template-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+  .save-flash { font-size: .78rem; color: var(--green); margin-right: auto; align-self: center; opacity: 0; transition: opacity .3s; }
+  .save-flash.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Referral Partner Tracker</h1>
+    <div class="sub">Preston · Balwyn · Kew · Bulleen · Doncaster · Reservoir · Pascoe Vale</div>
+  </div>
+  <nav>
+    <button data-view="dashboard" class="active">Dashboard</button>
+    <button data-view="contacts">Contacts</button>
+    <button data-view="templates">Templates</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section id="view-dashboard" class="view active">
+    <div class="card goal-bar">
+      <div>
+        <div class="count" id="stat-partners">0 / 5</div>
+        <div class="label">categories with an active referral partner</div>
+        <div class="cat-pills" id="cat-pills"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>Contacts by category</h2>
+        <div id="chart-category"></div>
+      </div>
+      <div class="card">
+        <h2>Pipeline by status</h2>
+        <div id="chart-status"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Due this week</h2>
+      <ul class="due-list" id="due-list"></ul>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="view-contacts" class="view">
+    <div class="toolbar">
+      <input type="text" id="search-input" placeholder="Search name, business, notes…" />
+      <select id="filter-category"><option value="">All categories</option></select>
+      <select id="filter-status"><option value="">All statuses</option></select>
+      <button class="btn" id="btn-add-contact">+ Add Contact</button>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Category</th><th>Business</th><th>Suburb</th><th>Status</th>
+            <th>Last Contact</th><th>Next Action</th><th>Next Action Date</th><th>Notes</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="contacts-tbody"></tbody>
+      </table>
+      <p class="empty-note" id="contacts-empty" style="display:none;">No contacts match. Add one or clear your filters.</p>
+    </div>
+  </section>
+
+  <!-- TEMPLATES -->
+  <section id="view-templates" class="view">
+    <h2>Outreach message templates</h2>
+    <div id="templates-list"></div>
+  </section>
+
+</main>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Add Contact</h3>
+    <form id="contact-form">
+      <input type="hidden" id="f-id" />
+      <div class="form-grid">
+        <div>
+          <label>Name *</label>
+          <input type="text" id="f-name" required />
+        </div>
+        <div>
+          <label>Category *</label>
+          <select id="f-category" required></select>
+        </div>
+        <div>
+          <label>Business name</label>
+          <input type="text" id="f-business" />
+        </div>
+        <div>
+          <label>Suburb</label>
+          <input type="text" id="f-suburb" list="suburb-options" />
+          <datalist id="suburb-options"></datalist>
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="f-status"></select>
+        </div>
+        <div>
+          <label>Last contact date</label>
+          <input type="date" id="f-lastcontact" />
+        </div>
+        <div>
+          <label>Next action</label>
+          <input type="text" id="f-nextaction" placeholder="e.g. Follow-up call" />
+        </div>
+        <div>
+          <label>Next action date</label>
+          <input type="date" id="f-nextdate" />
+        </div>
+        <div class="full">
+          <label>Notes</label>
+          <textarea id="f-notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn danger" id="btn-delete" style="display:none; margin-right:auto;">Delete</button>
+        <button type="button" class="btn secondary" id="btn-cancel">Cancel</button>
+        <button type="submit" class="btn">Save Contact</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var CATEGORIES = [
+    { key: "buyers_agent", label: "Buyer's Agent" },
+    { key: "accountant",   label: "Property Accountant" },
+    { key: "conveyancer",  label: "Conveyancer" },
+    { key: "planner",      label: "Financial Planner" },
+    { key: "agent",        label: "Real Estate Agent" }
+  ];
+
+  var STATUSES = [
+    { key: "not_contacted",  label: "Not Contacted" },
+    { key: "engaged_social", label: "Engaged on Social" },
+    { key: "messaged",       label: "Messaged" },
+    { key: "replied",        label: "Replied" },
+    { key: "call_booked",    label: "Call Booked" },
+    { key: "active_partner", label: "Active Partner" },
+    { key: "dead",           label: "Dead" }
+  ];
+
+  var SUBURBS = ["Preston", "Balwyn", "Kew", "Bulleen", "Doncaster", "Reservoir", "Pascoe Vale"];
+
+  var DEFAULT_TEMPLATES = {
+    buyers_agent: "Hi [Name], I'm a mortgage broker working across Preston/Balwyn/Kew/Bulleen/Doncaster/Reservoir/Pascoe Vale. I'd love to explore referring clients back and forth — I regularly get finance-ready buyers who don't yet have a buyer's agent. Keen for a quick coffee or call to see if it's a fit?",
+    accountant: "Hi [Name], I'm a local mortgage broker and a lot of my clients (investors especially) need a good property-savvy accountant. I think there could be a solid two-way referral relationship here — open to a quick chat?",
+    conveyancer: "Hi [Name], I'm a mortgage broker in the area and regularly have clients who need a reliable conveyancer once finance is approved. Would you be open to a call to talk about referring work to each other?",
+    planner: "Hi [Name], I'm a local mortgage broker and often work with clients who'd benefit from proper financial planning alongside their loan strategy. I think we could send each other good-fit referrals — keen to connect?",
+    agent: "Hi [Name], I'm a mortgage broker working [suburb] and surrounds. I'd love to be your go-to broker for pre-approvals so your buyers move faster — happy to grab a coffee and see how we can support each other."
+  };
+
+  var STORAGE_CONTACTS = "mrt.contacts.v1";
+  var STORAGE_TEMPLATES = "mrt.templates.v1";
+
+  function catLabel(key) {
+    var c = CATEGORIES.filter(function (c) { return c.key === key; })[0];
+    return c ? c.label : key;
+  }
+  function statusLabel(key) {
+    var s = STATUSES.filter(function (s) { return s.key === key; })[0];
+    return s ? s.label : key;
+  }
+  function uid() {
+    return "c_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  function escapeHtml(str) {
+    return String(str || "").replace(/[&<>"']/g, function (m) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+    });
+  }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    var d = new Date(iso + "T00:00:00");
+    if (isNaN(d)) return "—";
+    return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+  }
+  function todayIso() {
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString().slice(0, 10);
+  }
+
+  var Store = {
+    contacts: [],
+    templates: {},
+    load: function () {
+      try {
+        var raw = localStorage.getItem(STORAGE_CONTACTS);
+        this.contacts = raw ? JSON.parse(raw) : [];
+      } catch (e) { this.contacts = []; }
+      try {
+        var rawT = localStorage.getItem(STORAGE_TEMPLATES);
+        this.templates = rawT ? JSON.parse(rawT) : {};
+      } catch (e) { this.templates = {}; }
+      CATEGORIES.forEach(function (c) {
+        if (typeof Store.templates[c.key] !== "string") {
+          Store.templates[c.key] = DEFAULT_TEMPLATES[c.key] || "";
+        }
+      });
+    },
+    saveContacts: function () {
+      localStorage.setItem(STORAGE_CONTACTS, JSON.stringify(this.contacts));
+    },
+    saveTemplates: function () {
+      localStorage.setItem(STORAGE_TEMPLATES, JSON.stringify(this.templates));
+    }
+  };
+
+  // ---------- Navigation ----------
+  document.querySelectorAll("nav button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("nav button").forEach(function (b) { b.classList.remove("active"); });
+      document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("view-" + btn.dataset.view).classList.add("active");
+      if (btn.dataset.view === "dashboard") renderDashboard();
+      if (btn.dataset.view === "contacts") renderContacts();
+      if (btn.dataset.view === "templates") renderTemplates();
+    });
+  });
+
+  // ---------- Dashboard ----------
+  function renderDashboard() {
+    var wonByCat = {};
+    CATEGORIES.forEach(function (c) { wonByCat[c.key] = false; });
+    Store.contacts.forEach(function (ct) {
+      if (ct.status === "active_partner") wonByCat[ct.category] = true;
+    });
+    var wonCount = Object.keys(wonByCat).filter(function (k) { return wonByCat[k]; }).length;
+    document.getElementById("stat-partners").textContent = wonCount + " / " + CATEGORIES.length;
+
+    var pillsHtml = CATEGORIES.map(function (c) {
+      return '<span class="cat-pill' + (wonByCat[c.key] ? " won" : "") + '">' +
+        (wonByCat[c.key] ? "✓ " : "") + escapeHtml(c.label) + "</span>";
+    }).join("");
+    document.getElementById("cat-pills").innerHTML = pillsHtml;
+
+    var catCounts = CATEGORIES.map(function (c) {
+      return { label: c.label, count: Store.contacts.filter(function (ct) { return ct.category === c.key; }).length };
+    });
+    var maxCat = Math.max(1, Math.max.apply(null, catCounts.map(function (c) { return c.count; })));
+    document.getElementById("chart-category").innerHTML = catCounts.map(function (c) {
+      return barRow(c.label, c.count, maxCat);
+    }).join("");
+
+    var statusCounts = STATUSES.map(function (s) {
+      return { label: s.label, count: Store.contacts.filter(function (ct) { return ct.status === s.key; }).length };
+    });
+    var maxStatus = Math.max(1, Math.max.apply(null, statusCounts.map(function (s) { return s.count; })));
+    document.getElementById("chart-status").innerHTML = statusCounts.map(function (s) {
+      return barRow(s.label, s.count, maxStatus);
+    }).join("");
+
+    renderDueList();
+  }
+
+  function barRow(label, count, max) {
+    var pct = Math.round((count / max) * 100);
+    return '<div class="bar-row">' +
+      '<div class="bar-label">' + escapeHtml(label) + '</div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="bar-count">' + count + '</div>' +
+      '</div>';
+  }
+
+  function renderDueList() {
+    var today = todayIso();
+    var weekAhead = new Date();
+    weekAhead.setDate(weekAhead.getDate() + 7);
+    var weekAheadIso = weekAhead.toISOString().slice(0, 10);
+
+    var due = Store.contacts.filter(function (ct) {
+      return ct.nextActionDate && ct.status !== "dead" && ct.nextActionDate <= weekAheadIso;
+    }).sort(function (a, b) { return a.nextActionDate.localeCompare(b.nextActionDate); });
+
+    var list = document.getElementById("due-list");
+    if (!due.length) {
+      list.innerHTML = '<p class="empty-note">Nothing due in the next 7 days.</p>';
+      return;
+    }
+    list.innerHTML = due.map(function (ct) {
+      var overdue = ct.nextActionDate < today;
+      return '<li class="due-item">' +
+        '<div>' +
+          '<div class="who">' + escapeHtml(ct.name) + ' <span style="font-weight:400;color:var(--gray);">(' + escapeHtml(catLabel(ct.category)) + ')</span></div>' +
+          '<div class="what">' + escapeHtml(ct.nextAction || "—") + '</div>' +
+        '</div>' +
+        '<span class="due-date ' + (overdue ? "overdue" : "soon") + '">' + (overdue ? "Overdue · " : "") + fmtDate(ct.nextActionDate) + '</span>' +
+      '</li>';
+    }).join("");
+  }
+
+  // ---------- Contacts ----------
+  var catFilterEl = document.getElementById("filter-category");
+  var statusFilterEl = document.getElementById("filter-status");
+  CATEGORIES.forEach(function (c) {
+    var o = document.createElement("option"); o.value = c.key; o.textContent = c.label;
+    catFilterEl.appendChild(o);
+  });
+  STATUSES.forEach(function (s) {
+    var o = document.createElement("option"); o.value = s.key; o.textContent = s.label;
+    statusFilterEl.appendChild(o);
+  });
+  document.getElementById("search-input").addEventListener("input", renderContacts);
+  catFilterEl.addEventListener("change", renderContacts);
+  statusFilterEl.addEventListener("change", renderContacts);
+
+  function renderContacts() {
+    var q = document.getElementById("search-input").value.trim().toLowerCase();
+    var catF = catFilterEl.value;
+    var statusF = statusFilterEl.value;
+
+    var rows = Store.contacts.filter(function (ct) {
+      if (catF && ct.category !== catF) return false;
+      if (statusF && ct.status !== statusF) return false;
+      if (q) {
+        var hay = [ct.name, ct.business, ct.notes].join(" ").toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    }).sort(function (a, b) { return (a.name || "").localeCompare(b.name || ""); });
+
+    var tbody = document.getElementById("contacts-tbody");
+    document.getElementById("contacts-empty").style.display = rows.length ? "none" : "block";
+
+    tbody.innerHTML = rows.map(function (ct) {
+      return "<tr>" +
+        "<td>" + escapeHtml(ct.name) + "</td>" +
+        "<td>" + escapeHtml(catLabel(ct.category)) + "</td>" +
+        "<td>" + escapeHtml(ct.business) + "</td>" +
+        "<td>" + escapeHtml(ct.suburb) + "</td>" +
+        '<td><span class="badge ' + ct.status + '">' + escapeHtml(statusLabel(ct.status)) + "</span></td>" +
+        "<td>" + fmtDate(ct.lastContactDate) + "</td>" +
+        "<td>" + escapeHtml(ct.nextAction) + "</td>" +
+        "<td>" + fmtDate(ct.nextActionDate) + "</td>" +
+        '<td class="notes-cell" title="' + escapeHtml(ct.notes) + '">' + escapeHtml(ct.notes) + "</td>" +
+        '<td class="row-actions">' +
+          '<button class="btn secondary" data-edit="' + ct.id + '">Edit</button>' +
+        "</td>" +
+      "</tr>";
+    }).join("");
+
+    tbody.querySelectorAll("[data-edit]").forEach(function (btn) {
+      btn.addEventListener("click", function () { openModal(btn.dataset.edit); });
+    });
+  }
+
+  // ---------- Modal / form ----------
+  var overlay = document.getElementById("modal-overlay");
+  var form = document.getElementById("contact-form");
+  var catSelect = document.getElementById("f-category");
+  var statusSelect = document.getElementById("f-status");
+  var suburbList = document.getElementById("suburb-options");
+
+  CATEGORIES.forEach(function (c) {
+    var o = document.createElement("option"); o.value = c.key; o.textContent = c.label;
+    catSelect.appendChild(o);
+  });
+  STATUSES.forEach(function (s) {
+    var o = document.createElement("option"); o.value = s.key; o.textContent = s.label;
+    statusSelect.appendChild(o);
+  });
+  SUBURBS.forEach(function (s) {
+    var o = document.createElement("option"); o.value = s;
+    suburbList.appendChild(o);
+  });
+
+  document.getElementById("btn-add-contact").addEventListener("click", function () { openModal(null); });
+  document.getElementById("btn-cancel").addEventListener("click", closeModal);
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) closeModal(); });
+
+  function openModal(id) {
+    var ct = id ? Store.contacts.filter(function (c) { return c.id === id; })[0] : null;
+    document.getElementById("modal-title").textContent = ct ? "Edit Contact" : "Add Contact";
+    document.getElementById("f-id").value = ct ? ct.id : "";
+    document.getElementById("f-name").value = ct ? ct.name : "";
+    catSelect.value = ct ? ct.category : CATEGORIES[0].key;
+    document.getElementById("f-business").value = ct ? ct.business : "";
+    document.getElementById("f-suburb").value = ct ? ct.suburb : "";
+    statusSelect.value = ct ? ct.status : "not_contacted";
+    document.getElementById("f-lastcontact").value = ct ? ct.lastContactDate || "" : "";
+    document.getElementById("f-nextaction").value = ct ? ct.nextAction || "" : "";
+    document.getElementById("f-nextdate").value = ct ? ct.nextActionDate || "" : "";
+    document.getElementById("f-notes").value = ct ? ct.notes || "" : "";
+    document.getElementById("btn-delete").style.display = ct ? "inline-block" : "none";
+    overlay.classList.add("active");
+    document.getElementById("f-name").focus();
+  }
+  function closeModal() { overlay.classList.remove("active"); }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var id = document.getElementById("f-id").value;
+    var data = {
+      id: id || uid(),
+      name: document.getElementById("f-name").value.trim(),
+      category: catSelect.value,
+      business: document.getElementById("f-business").value.trim(),
+      suburb: document.getElementById("f-suburb").value.trim(),
+      status: statusSelect.value,
+      lastContactDate: document.getElementById("f-lastcontact").value,
+      nextAction: document.getElementById("f-nextaction").value.trim(),
+      nextActionDate: document.getElementById("f-nextdate").value,
+      notes: document.getElementById("f-notes").value.trim()
+    };
+    if (!data.name) return;
+
+    if (id) {
+      var idx = Store.contacts.findIndex(function (c) { return c.id === id; });
+      if (idx > -1) Store.contacts[idx] = data;
+    } else {
+      Store.contacts.push(data);
+    }
+    Store.saveContacts();
+    closeModal();
+    renderContacts();
+    renderDashboard();
+  });
+
+  document.getElementById("btn-delete").addEventListener("click", function () {
+    var id = document.getElementById("f-id").value;
+    if (!id) return;
+    if (!confirm("Delete this contact? This can't be undone.")) return;
+    Store.contacts = Store.contacts.filter(function (c) { return c.id !== id; });
+    Store.saveContacts();
+    closeModal();
+    renderContacts();
+    renderDashboard();
+  });
+
+  // ---------- Templates ----------
+  function renderTemplates() {
+    var container = document.getElementById("templates-list");
+    container.innerHTML = CATEGORIES.map(function (c) {
+      return '<div class="card template-card">' +
+        "<h3>" + escapeHtml(c.label) + "</h3>" +
+        '<textarea data-cat="' + c.key + '" rows="4">' + escapeHtml(Store.templates[c.key] || "") + "</textarea>" +
+        '<div class="template-actions">' +
+          '<span class="save-flash" data-flash-for="' + c.key + '">Saved</span>' +
+          '<button class="btn secondary" data-copy="' + c.key + '">Copy to clipboard</button>' +
+          '<button class="btn" data-save="' + c.key + '">Save</button>' +
+        "</div>" +
+      "</div>";
+    }).join("");
+
+    container.querySelectorAll("[data-save]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.dataset.save;
+        var ta = container.querySelector('textarea[data-cat="' + key + '"]');
+        Store.templates[key] = ta.value;
+        Store.saveTemplates();
+        var flash = container.querySelector('[data-flash-for="' + key + '"]');
+        flash.classList.add("show");
+        setTimeout(function () { flash.classList.remove("show"); }, 1500);
+      });
+    });
+
+    container.querySelectorAll("[data-copy]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.dataset.copy;
+        var ta = container.querySelector('textarea[data-cat="' + key + '"]');
+        var text = ta.value;
+        var done = function () {
+          var original = btn.textContent;
+          btn.textContent = "Copied!";
+          setTimeout(function () { btn.textContent = original; }, 1200);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+        } else {
+          fallbackCopy(text, done);
+        }
+      });
+    });
+  }
+
+  function fallbackCopy(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+
+  // ---------- Init ----------
+  Store.load();
+  renderDashboard();
+  renderContacts();
+  renderTemplates();
+})();
+</script>
+
+</body>
+</html>
