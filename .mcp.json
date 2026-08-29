@@ -1,5 +1,15 @@
 {
   "mcpServers": {
+    "image-generator": {
+      "command": "node",
+      "args": [
+        "mcp-servers/claude-code-generate-images-mcp/src/index.js"
+      ],
+      "env": {
+        "IMAGE_PROVIDER": "google",
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+      }
+    },
     "claude-flow": {
       "command": "npx",
       "args": [
