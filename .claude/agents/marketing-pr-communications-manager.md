@@ -1,0 +1,1 @@
+../../.agents/agents/marketing-pr-communications-manager.md

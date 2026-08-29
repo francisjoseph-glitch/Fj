@@ -1,0 +1,1 @@
+../../.agents/agents/legal-document-review.md

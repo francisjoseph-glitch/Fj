@@ -1,0 +1,1 @@
+../../.agents/agents/gis-bim-specialist.md

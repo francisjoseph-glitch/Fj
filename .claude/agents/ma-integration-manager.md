@@ -1,0 +1,1 @@
+../../.agents/agents/ma-integration-manager.md

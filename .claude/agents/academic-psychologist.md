@@ -1,0 +1,1 @@
+../../.agents/agents/academic-psychologist.md

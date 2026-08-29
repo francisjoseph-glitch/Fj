@@ -1,0 +1,1 @@
+../../.agents/agents/finance-financial-analyst.md

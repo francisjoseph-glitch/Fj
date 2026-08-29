@@ -1,0 +1,1 @@
+../../.agents/agents/specialized-french-consulting-market.md

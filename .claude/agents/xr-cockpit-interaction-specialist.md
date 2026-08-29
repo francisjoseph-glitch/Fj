@@ -1,0 +1,1 @@
+../../.agents/agents/xr-cockpit-interaction-specialist.md

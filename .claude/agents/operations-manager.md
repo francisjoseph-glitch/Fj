@@ -1,0 +1,1 @@
+../../.agents/agents/operations-manager.md
