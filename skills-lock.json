@@ -277,6 +277,12 @@
       "skillPath": "skills/social-content/SKILL.md",
       "computedHash": "755e9cc7e222bc6196972e749a4eaebf97f9827a331a19265f220bbf7e3c234e"
     },
+    "stock-analysis": {
+      "source": "gracefullight/stock-checker",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/stock-analysis/SKILL.md",
+      "computedHash": "bcd3abe47bd81a2c39b77fd3f116f98ff1f30ffe2604fc4189fd5d717581ff00"
+    },
     "video": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
