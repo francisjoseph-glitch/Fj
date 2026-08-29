@@ -1,0 +1,1 @@
+../../.agents/agents/security-architect.md

@@ -1,0 +1,1 @@
+../../.agents/agents/security-threat-intelligence-analyst.md

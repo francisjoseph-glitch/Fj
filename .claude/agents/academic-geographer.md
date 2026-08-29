@@ -1,0 +1,1 @@
+../../.agents/agents/academic-geographer.md

@@ -1,0 +1,1 @@
+../../.agents/agents/corporate-training-designer.md

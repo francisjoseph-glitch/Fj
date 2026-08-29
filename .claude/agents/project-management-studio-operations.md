@@ -1,0 +1,1 @@
+../../.agents/agents/project-management-studio-operations.md

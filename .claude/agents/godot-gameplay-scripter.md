@@ -1,0 +1,1 @@
+../../.agents/agents/godot-gameplay-scripter.md

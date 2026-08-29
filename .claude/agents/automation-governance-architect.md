@@ -1,0 +1,1 @@
+../../.agents/agents/automation-governance-architect.md

@@ -1,0 +1,1 @@
+../../.agents/agents/specialized-document-generator.md
