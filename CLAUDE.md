@@ -6,7 +6,7 @@ Francis: senior home lending specialist (Melbourne), property investor, runs @Fi
 
 Mostly a home for Claude skills and brand context, not an app.
 
-- `.claude/skills/`: skills (Instagram `ig-*`, brand voice, content, real estate, AU tax, Obsidian, visuals)
+- `.claude/skills/`: skills (Instagram `ig-*`, brand voice, content, AU tax, Obsidian, visuals)
 - `.agents/instagram/voice.md`: Francis's voice. Read it before writing any Instagram content.
 - `.agents/product-marketing-context.md`: audience, positioning and compliance guardrails
 - `src/`: static site
