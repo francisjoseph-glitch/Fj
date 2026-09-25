@@ -188,12 +188,6 @@
         "source": "github",
         "repo": "JuliusBrussee/caveman"
       }
-    },
-    "knowledge-work-plugins": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/knowledge-work-plugins"
-      }
     }
   },
   "claudeFlow": {
@@ -301,7 +295,6 @@
     }
   },
   "enabledPlugins": {
-    "caveman@caveman": true,
-    "sales@knowledge-work-plugins": true
+    "caveman@caveman": true
   }
 }
