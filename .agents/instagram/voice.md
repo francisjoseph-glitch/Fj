@@ -12,10 +12,10 @@ full compliance guardrails.
 ## Who I am
 
 - **Name:** Francis
-- **Handle:** @FinancewithFrancis
+- **Handle:** @financewithfrancis_ (brand name Finance with Francis)
 - **What I do, in one sentence:** Home lending specialist in Melbourne who invests in property and explains how lending, property and wealth building actually work in Australia.
 - **Who I am talking to:** Australians, mostly Melbourne and Victoria, trying to buy their first home, refinance, or grow a property portfolio.
-- **What I sell:** [CONFIRM] Nothing currently assumed. Education content only.
+- **What I sell:** Home loan appointments with me at CBA, via the booking link in bio. Content itself is education only.
 
 ## What I sound like
 
@@ -57,4 +57,4 @@ The skills will never invent one. [CONFIRM] Add real numbers you are happy to pu
 
 - **My keyword CTA, if I use one:** [CONFIRM]
 - **What the keyword sends them:** [CONFIRM]
-- **Where my link goes:** [CONFIRM]
+- **Where my link goes:** CBA Microsoft Bookings page ("Book with me"). [CONFIRM] approved by CBA for use from this account.
