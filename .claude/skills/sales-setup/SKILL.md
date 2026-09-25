@@ -152,7 +152,7 @@ conversations, schedule:
    the week summary on one dashboard: the book of business, where
    customers are spending, out-of-date opportunities, emails that need a
    reply, this week's meetings. Close with the routines offer: run
-   daily-briefing, crm-hygiene-check, end-of-day and weekly-wrap on a
+   daily-briefing, end-of-day and weekly-wrap on a
    schedule (scheduled runs take the actions the user sets them up to
    take, within connector permissions, and show everything else as
    proposals).
