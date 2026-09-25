@@ -54,8 +54,9 @@ WEEK 1  ·  28 Sep - 4 Oct  ·  reset the hook
 MON  engage only (20 min)
 TUE  7:30pm  REEL      TEACH    #3  Nobody Tells You  - offset sequel: an offset only works
                                     if the money actually sits in it. Offset vs redraw in one line.
-THU  7:30pm  REEL      STORY    #1  Cost Confession   - one real cost from your 2021 purchase
-                                    you did not see coming. Your number, stated in the first line.
+THU  7:30pm  REEL      STORY    #21 Mid-Sentence Start - "...and I nodded like I knew what they
+                                    meant." The question you were too embarrassed to ask when you
+                                    bought your first place, and the answer. No dollar figures.
 SAT  11:00am IMAGE     INTRO        new "Hey, I'm Francis" post. Who it is for, what you post,
                                     one line on the day job. Pin it, replace the May one.
 SUN  6:00pm  REEL      PERSONALITY  things people say when they find out you are a home lender
@@ -75,24 +76,27 @@ WEEK 3  ·  12 - 18 Oct  ·  insider and proof
 MON  engage only
 TUE  7:30pm  REEL      TEACH    #8  Insider Leak      - "I look at bank statements every day.
                                     Here's what jumps out first." Spending patterns, BNPL, gambling.
-THU  7:30pm  REEL      PROOF    #6  The Receipt       - your first place, five years on, the
-                                    actual numbers. Only what you are happy to put your name on.
+THU  7:30pm  REEL      PROOF    #12 The Objection     - "I'm not ready to talk to a lender yet."
+                                    What a lending appointment actually looks like, start to finish:
+                                    what you ask, what they bring, what happens after. Film your desk.
 SAT  11:00am CAROUSEL  TEACH        your first 12 months after settlement (the Aug 24 theme, 3.8x)
 SUN  6:00pm  REEL      PERSONALITY  pick the best idea from the week's story replies
 
 WEEK 4  ·  19 - 25 Oct  ·  opinion and offer
 
 MON  engage only
-TUE  7:30pm  REEL      OPINION  #22 Contrarian Flip   - one of your positions (see below)
+TUE  7:30pm  REEL      OPINION  #22 Contrarian Flip   - "Your first home doesn't have to be your
+                                    forever home." Default pick; swap for another below if you prefer.
 THU  7:30pm  REEL      TEACH    #3  Nobody Tells You  - guarantor loans: what your parents are
                                     actually signing up for
-SAT  11:00am CAROUSEL  OFFER        what a first chat with you looks like, start to finish.
-                                    Plain, no apology, ends at the booking link.
+SAT  11:00am CAROUSEL  OFFER        what to bring to your first appointment: the document
+                                    checklist. Plain, no apology, ends at the booking link.
 SUN  6:00pm  REEL      STORY    #21 Mid-Sentence Start - the one thing you'd do differently
                                     buying your next property
 ```
 
-Opinion slot candidates. Only use ones you actually hold:
+Opinion posts take a side some viewers will disagree with. That friction is what gets
+comments and shares. Only use a position you actually hold:
 
 - Paying LMI to buy two years earlier can beat saving for 20%.
 - Loyalty to your current lender is not a strategy. Ask for a rate review every year.
