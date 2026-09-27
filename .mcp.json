@@ -1,10 +1,23 @@
 {
   "mcpServers": {
+    "garmin": {
+      "command": "npx",
+      "args": [
+        "@etweisberg/garmin-connect-mcp"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
     "claude-flow": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "-y",
-        "ruflo@3.7.0-alpha.7",
+        "ruflo@latest",
         "mcp",
         "start"
       ],
@@ -17,18 +30,6 @@
         "CLAUDE_FLOW_MEMORY_BACKEND": "hybrid"
       },
       "autoStart": false
-    },
-    "garmin": {
-      "command": "npx",
-      "args": [
-        "@etweisberg/garmin-connect-mcp"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ]
     }
   }
 }
