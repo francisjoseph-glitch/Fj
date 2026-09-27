@@ -193,6 +193,12 @@
         "source": "github",
         "repo": "JuliusBrussee/caveman"
       }
+    },
+    "ruflo": {
+      "source": {
+        "source": "github",
+        "repo": "ruvnet/ruflo"
+      }
     }
   },
   "claudeFlow": {
@@ -300,6 +306,10 @@
     }
   },
   "enabledPlugins": {
-    "caveman@caveman": true
+    "caveman@caveman": true,
+    "ruflo-core@ruflo": true,
+    "ruflo-swarm@ruflo": true,
+    "ruflo-rag-memory@ruflo": true,
+    "ruflo-neural-trader@ruflo": true
   }
 }
