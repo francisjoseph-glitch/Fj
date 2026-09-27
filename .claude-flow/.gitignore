@@ -3,5 +3,7 @@ data/
 logs/
 sessions/
 neural/
+policy/
+harness-active-policy.json
 *.log
 *.tmp
