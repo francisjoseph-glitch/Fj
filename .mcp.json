@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "garmin": {
-      "command": "npx",
-      "args": [
-        "@etweisberg/garmin-connect-mcp"
-      ]
-    },
     "playwright": {
       "command": "npx",
       "args": [
