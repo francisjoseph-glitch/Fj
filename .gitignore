@@ -48,3 +48,5 @@ specs/change/active
 videos/
 .env
 .env.*
+__pycache__/
+*.pyc
