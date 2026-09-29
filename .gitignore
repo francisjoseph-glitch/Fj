@@ -43,3 +43,8 @@ tsconfig.tsbuildinfo
 task.md
 specs/change/active
 .ralph/
+
+# Video studio: raw footage, renders and API keys stay out of git.
+videos/
+.env
+.env.*
