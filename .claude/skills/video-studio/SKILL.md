@@ -30,15 +30,19 @@ Helpers live at `.claude/skills/video-use/helpers/`. Never write outputs inside 
 ## Setup check (every cold start, don't reinstall)
 
 - `ffmpeg` and `ffprobe` on PATH.
-- Python 3.10+ with `requests librosa matplotlib pillow numpy` (`pip install -e .claude/skills/video-use` does it).
+- Python 3.10+ with `requests librosa matplotlib pillow numpy` (`pip install -e .claude/skills/video-use` does it; add `faster-whisper` for local transcription).
 - Node 22+ (HyperFrames is run with `npx --yes hyperframes ...`; `npx hyperframes doctor` checks the render deps).
-- `ELEVENLABS_API_KEY` in the environment, or in `.claude/skills/video-use/.env` (git-ignored). If missing, ask the user for it and write it there. Never commit it and never put it in `videos/`.
+- Transcription engine, one of:
+  - **Local, free (default when no key):** `helpers/transcribe_local.py` (faster-whisper, `pip install faster-whisper`). No key, no upload. Output is Scribe-shaped, so every other helper works unchanged. Weaker on fillers: Whisper tends to drop um/uh, so the helper prompts for them and disables VAD, but still spot-check `takes_packed.md` against the audio. No speaker labels. Model `small.en` is fine on a laptop, `medium.en` if fillers are being missed. The first run downloads the model.
+  - **ElevenLabs Scribe (paid, most faithful on fillers):** `helpers/transcribe.py` and `transcribe_batch.py`. Needs `ELEVENLABS_API_KEY` in the environment or in `.claude/skills/video-use/.env` (git-ignored). Never commit it and never put it in `videos/`.
+  - Ask which the user wants if unclear. Both write to the same `edit/transcripts/` cache, so never mix engines on one source.
+  - `transcribe_batch.py` is Scribe only. For several local takes, loop `transcribe_local.py`.
 
-Cut transcription uses ElevenLabs Scribe on purpose: it is verbatim with word timestamps and audio events, so fillers survive to be removed. Local Whisper (the HyperFrames default) normalises fillers away, so use it only for the graphics pass on the already-cleaned video.
+The HyperFrames `hyperframes transcribe` (local Whisper) is for the graphics pass on the already-cleaned video, where fillers no longer matter.
 
 ## Pipeline
 
-1. **Inventory.** `ffprobe` the raw file, transcribe with `helpers/transcribe.py`, build `takes_packed.md` with `helpers/pack_transcripts.py --edit-dir videos/<project>/edit`.
+1. **Inventory.** `ffprobe` the raw file, transcribe with `helpers/transcribe_local.py` or `helpers/transcribe.py` (see Setup), build `takes_packed.md` with `helpers/pack_transcripts.py --edit-dir videos/<project>/edit`.
 2. **Ask before cutting.** Shape the questions around the material. Always settle: target platform and aspect (Instagram Reels is 1080x1920@30, ask before assuming), target length, how aggressive the filler removal is, brand palette and fonts for graphics, whether captions are wanted.
 3. **Propose the plan in plain English** (4 to 8 sentences: cuts, filler policy, graphics plan, grade, length) and **wait for approval**. No cutting before that (Hard Rule 11).
 4. **Cut.** Write `edl.json`, render a `--preview`, then the final with `helpers/render.py`.
